@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="Offline-first HFM manual trading companion for Android">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<title>HFM Smart Trader</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#17243a;--line:#263751;--txt:#edf3ff;--muted:#9aabc4;--green:#22c58b;--red:#ff6878;--gold:#f5c451;--blue:#65a8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#0b1220ed;border-bottom:1px solid var(--line);padding:13px 15px;backdrop-filter:blur(12px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;font-size:18px;letter-spacing:.2px}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:500}
+.pill{font-size:11px;padding:5px 9px;border:1px solid #755f2c;color:var(--gold);border-radius:30px;white-space:nowrap}
+nav{display:flex;gap:7px;overflow:auto;padding:10px 12px;background:#0e1829;position:sticky;top:61px;z-index:4;border-bottom:1px solid var(--line)}
+nav button{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:9px 12px;white-space:nowrap;font-weight:650}
+nav button.active{background:#1d3b5d;border-color:#477eb5;color:#fff}
+main{max-width:900px;margin:auto;padding:15px 13px 90px}.view{display:none}.view.active{display:block}
+h1{font-size:22px;margin:5px 0 4px}h2{font-size:17px;margin:0 0 12px}h3{font-size:14px;margin:0 0 7px}
+.sub{color:var(--muted);font-size:13px;line-height:1.45}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:11px 0}.metric{font-size:22px;font-weight:800;margin-top:5px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}
+button,.btn{border:0;border-radius:10px;background:#2866a3;color:white;padding:11px 13px;font-weight:700;font-size:14px;cursor:pointer}
+button.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--txt)}button.danger{background:#642b3a}button.good{background:#17694e}
+input,select,textarea{width:100%;background:#0b1525;color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:11px;font:inherit;outline:none}
+textarea{min-height:100px;resize:vertical}.field{margin:10px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.signal{font-size:24px;font-weight:900}.buy{color:var(--green)}.sell{color:var(--red)}.wait{color:var(--gold)}
+.note{background:#30291a;border:1px solid #66552c;color:#f7d98a;padding:11px;border-radius:10px;font-size:12px;line-height:1.45;margin:10px 0}
+.goodnote{background:#102d28;border:1px solid #205c4c;color:#a8f0d6;padding:11px;border-radius:10px;font-size:12px;line-height:1.45}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:9px 5px}th{color:var(--muted)}
+.listitem{padding:10px 0;border-bottom:1px solid var(--line)}.listitem:last-child{border:0}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+canvas{width:100%;height:170px;background:#0a1423;border:1px solid var(--line);border-radius:10px}
+.small{font-size:11px;color:var(--muted)}.hidden{display:none!important}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)} main{padding-top:22px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="brand">HFM SMART TRADER <small>ANDROID MANUAL TRADING COMPANION</small></div><span class="pill">MANUAL MODE · DEMO FIRST</span></div></header>
+<nav id="tabs">
+<button class="active" data-view="home">Overview</button><button data-view="ict">ICT Scanner</button><button data-view="risk">Risk Tool</button><button data-view="journal">Journal</button><button data-view="news">News</button><button data-view="settings">Settings</button>
+</nav>
+<main>
+<section class="view active" id="home">
+<h1>Trading overview</h1><p class="sub">A phone-first companion for analysis and trade planning. Enter market data yourself; execute approved trades in the HFM MT5 app.</p>
+<div class="grid">
+<div class="card"><div class="label">Trading mode</div><div class="metric">MANUAL</div><div class="small">No automatic orders</div></div>
+<div class="card"><div class="label">Saved journal trades</div><div class="metric" id="homeTrades">0</div><div class="small">Stored on this phone</div></div>
+<div class="card"><div class="label">Risk per trade</div><div class="metric" id="homeRisk">1.0%</div><div class="small">Editable in Risk Tool</div></div>
+<div class="card"><div class="label">App connection</div><div class="metric" style="font-size:17px">ON DEVICE</div><div class="small">Offline-ready after install</div></div>
+</div>
+<div class="card"><h2>Quick actions</h2><div class="row"><button onclick="show('ict')">Open ICT scanner</button><button class="secondary" onclick="show('risk')">Calculate lot size</button><button class="secondary" onclick="show('journal')">Open journal</button></div></div>
+<div class="note"><b>Important limitation:</b> this Android rebuild does not connect to MT5 desktop, fetch live HFM account balances, read open positions, or send broker orders. It is a manual analysis and planning tool. Use the HFM MT5 app separately to verify prices and place trades.</div>
+<div class="card"><h2>Manual trade workflow</h2><ol class="sub"><li>Check the instrument and current quote in HFM MT5.</li><li>Enter completed candle data in the ICT Scanner, or plan a trade manually.</li><li>Calculate position size and risk.</li><li>Verify entry, stop-loss, take-profit, spread and margin in MT5.</li><li>Place the trade yourself in MT5, then record it in the journal.</li></ol></div>
+</section>
+
+<section class="view" id="ict">
+<h1>ICT Entry / Exit Scanner</h1><p class="sub">Rule-based approximation of the source project's ICT concepts. It requires completed candles entered by you; it does not download live candles.</p>
+<div class="card">
+<div class="two">
+<div class="field"><label>Symbol</label><input id="symbol" value="EURUSD"></div>
+<div class="field"><label>Timeframe</label><select id="tf"><option>M15</option><option>M5</option><option>H1</option><option>H4</option></select></div>
+</div>
+<div class="field"><label>Paste candle rows (oldest first): time,open,high,low,close</label><textarea id="candles" placeholder="2026-11-23 08:00,1.1500,1.1510,1.1490,1.1508&#10;2026-11-23 08:15,1.1508,1.1520,1.1501,1.1516"></textarea><div class="small">At least 30 completed candles. CSV rows; headers optional. Use dot decimals.</div></div>
+<div class="field"><label>Higher-timeframe candles (optional CSV, same format)</label><textarea id="htf" placeholder="Paste H1 candles here. If blank, scanner uses the supplied candles as context."></textarea></div>
+<div class="row"><button onclick="runScan()">Analyse candles</button><button class="secondary" onclick="document.getElementById('candles').value='';document.getElementById('htf').value='';document.getElementById('scanResult').innerHTML='No analysis yet.'">Clear</button></div>
+</div>
+<div class="card" id="scanResult"><div class="sub">No analysis yet. Paste at least 30 completed candles and tap Analyse.</div></div>
+<div class="card"><h2>Concept checklist</h2><div class="sub">The scanner evaluates swing highs/lows, liquidity sweeps, three-candle FVGs, volume/gap imbalances, basic order-block candidates, AMD range sweeps, premium/discount and a New York killzone reference. It is a simplified mobile port, not a byte-for-byte copy of the Python engine.</div></div>
+</section>
+
+<section class="view" id="risk">
+<h1>Risk & Lot Calculator</h1><p class="sub">Calculate a theoretical position size. Confirm contract size, tick value, volume step and margin in your HFM MT5 account before trading.</p>
+<div class="card">
+<div class="two">
+<div class="field"><label>Account balance (account currency)</label><input id="balance" type="number" value="1000" min="0" step="any"></div>
+<div class="field"><label>Risk per trade (%)</label><input id="riskPct" type="number" value="1" min="0.01" max="10" step="0.01"></div>
+<div class="field"><label>Entry price</label><input id="entry" type="number" value="1.15000" step="any"></div>
+<div class="field"><label>Stop-loss price</label><input id="stop" type="number" value="1.14800" step="any"></div>
+<div class="field"><label>Value per 1.00 price unit per 1 lot (account currency)</label><input id="unitValue" type="number" value="100000" step="any"></div>
+<div class="field"><label>Broker minimum lot</label><input id="minLot" type="number" value="0.01" step="any"></div>
+<div class="field"><label>Broker lot step</label><input id="lotStep" type="number" value="0.01" step="any"></div>
+<div class="field"><label>Maximum lot (optional cap)</label><input id="maxLot" type="number" value="100" step="any"></div>
+</div>
+<button onclick="calcRisk()">Calculate position size</button>
+<div id="riskResult" class="goodnote" style="margin-top:12px">Enter your account details and stop distance.</div>
+</div>
+<div class="note">The value-per-price-unit input depends on the symbol and contract specification. This calculator cannot query HFM's MT5 order_calc_profit from Android. Never assume the default is correct for every symbol or account type.</div>
+</section>
+
+<section class="view" id="journal">
+<h1>Trading Journal</h1><p class="sub">Records are saved in this browser on this phone. They are not synchronized to HFM or backed up automatically.</p>
+<div class="card">
+<h2>Add completed trade</h2>
+<div class="two">
+<div class="field"><label>Symbol</label><input id="jSymbol" value="EURUSD"></div><div class="field"><label>Direction</label><select id="jSide"><option>BUY</option><option>SELL</option></select></div>
+<div class="field"><label>Entry</label><input id="jEntry" type="number" step="any"></div><div class="field"><label>Exit</label><input id="jExit" type="number" step="any"></div>
+<div class="field"><label>Lot size</label><input id="jLot" type="number" step="any"></div><div class="field"><label>Profit / loss (account currency)</label><input id="jPnl" type="number" step="any"></div>
+</div>
+<div class="field"><label>Setup / notes</label><textarea id="jNotes" placeholder="Reason for entry, ICT concept, mistakes, lesson..."></textarea></div>
+<button onclick="addTrade()">Save journal trade</button>
+</div>
+<div class="card"><div class="row between"><h2>Trade history</h2><button class="secondary" onclick="exportJournal()">Export CSV</button></div><div id="journalList" class="sub">No trades recorded.</div></div>
+</section>
+
+<section class="view" id="news">
+<h1>Market News Intelligence</h1><p class="sub">The original project used Google News RSS through its Python server. This phone-only edition provides direct searches and does not label headlines as verified trading signals.</p>
+<div class="card"><h2>Open latest news searches</h2><div class="listitem"><b>Global macro & central banks</b><p class="sub">Rates, inflation, central-bank decisions and economic releases.</p><button onclick="openSearch('global macro central banks forex news')">Search news</button></div>
+<div class="listitem"><b>Forex market</b><p class="sub">Currency market headlines and policy updates.</p><button onclick="openSearch('forex currency market news')">Search news</button></div>
+<div class="listitem"><b>Gold & silver</b><p class="sub">Precious metals and dollar-sensitive news.</p><button onclick="openSearch('gold silver market news')">Search news</button></div>
+<div class="listitem"><b>Indices & equities</b><p class="sub">Global stocks and index market updates.</p><button onclick="openSearch('global stock indices market news')">Search news</button></div>
+<div class="listitem"><b>Oil & energy</b><p class="sub">Crude oil, supply and energy market updates.</p><button onclick="openSearch('crude oil energy market news')">Search news</button></div></div>
+</section>
+
+<section class="view" id="settings">
+<h1>Settings & help</h1>
+<div class="card"><h2>HFM account connection</h2><p class="sub">Use the official HFM MT5 Android app for login, live prices, account balance, positions and trade execution. This companion intentionally does not ask for or store your HFM password.</p><button onclick="window.open('https://www.hfm.com/','_blank')">Open HFM website</button></div>
+<div class="card"><h2>Install on Android</h2><p class="sub">After this app is published to a secure HTTPS address, open it in Chrome, tap the three-dot menu, then choose Install app or Add to Home screen.</p><p class="small">PWA installation requires secure hosting (HTTPS) for a normal website deployment.</p></div>
+<div class="card"><h2>Data management</h2><div class="row"><button class="secondary" onclick="exportAll()">Export app data</button><button class="danger" onclick="clearAll()">Erase local data</button></div></div>
+<div class="card"><h2>Build information</h2><p class="sub">HFM Smart Trader Android · Manual edition · Offline-first PWA. This rebuild preserves the workflow and main feature areas, but some desktop-connected functions are unavailable on Android-only hardware.</p></div>
+</section>
+<footer>Educational tool only. Not financial advice. Trading can result in loss. Always verify all values in HFM MT5.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+function num(id){return Number($(id).value)}
+function parseRows(text){
+ const rows=text.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean), out=[];
+ for(const line of rows){let p=line.split(',').map(x=>x.trim());if(p.length<5)continue;
+ let vals=p.slice(-4).map(Number); if(vals.some(v=>!Number.isFinite(v)))continue;
+ out.push({time:p.slice(0,p.length-4).join(',')||String(out.length),open:vals[0],high:vals[1],low:vals[2],close:vals[3]});
+ }return out;
+}
+function swings(d){let h=[],l=[];for(let i=1;i<d.length-1;i++){if(d[i].high>d[i-1].high&&d[i].high>d[i+1].high)h.push([i,d[i].high]);if(d[i].low<d[i-1].low&&d[i].low<d[i+1].low)l.push([i,d[i].low]);}return {h,l}}
+function scan(d,htf){
+ const price=d.at(-1).close, sw=swings(d), hs=htf.length>5?htf:d;
+ const hi=Math.max(...hs.slice(-80).map(x=>x.high)),lo=Math.min(...hs.slice(-80).map(x=>x.low)),mid=(hi+lo)/2;
+ let bull=0,bear=0,reasons=[],zones=[];
+ const last=d.at(-1), prior=d.slice(-15,-1), pHi=Math.max(...prior.map(x=>x.high)),pLo=Math.min(...prior.map(x=>x.low));
+ if(last.high>pHi&&last.close<pHi){bear+=3;reasons.push('Buyside liquidity swept and rejected.')}
+ if(last.low<pLo&&last.close>pLo){bull+=3;reasons.push('Sellside liquidity swept and reclaimed.')}
+ for(let i=Math.max(2,d.length-80);i<d.length;i++){
+  if(d[i].low>d[i-2].high){let z={type:'BULLISH FVG',low:d[i-2].high,high:d[i].low,bar:i};if(Math.min(Math.abs(price-z.low),Math.abs(price-z.high))/Math.max(price,1)<.0015||price>=z.low&&price<=z.high){zones.push(z);bull++;}}
+  if(d[i].high<d[i-2].low){let z={type:'BEARISH FVG',low:d[i].high,high:d[i-2].low,bar:i};if(Math.min(Math.abs(price-z.low),Math.abs(price-z.high))/Math.max(price,1)<.0015||price>=z.low&&price<=z.high){zones.push(z);bear++;}}
+ }
+ const pd=price<mid?'DISCOUNT':'PREMIUM';if(pd==='DISCOUNT'){bull++;reasons.push('Price is in higher-timeframe discount.')}else{bear++;reasons.push('Price is in higher-timeframe premium.')}
+ const base=d.slice(-15,-1),rangeHi=Math.max(...base.map(x=>x.high)),rangeLo=Math.min(...base.map(x=>x.low));
+ if(last.high>rangeHi&&last.close<rangeHi)reasons.push('AMD manipulation candidate: high swept then closed back inside.');
+ if(last.low<rangeLo&&last.close>rangeLo)reasons.push('AMD manipulation candidate: low swept then closed back inside.');
+ const side=bull>=5&&bull>=bear+2?'BUY':bear>=5&&bear>=bull+2?'SELL':'WAIT';
+ let entry=null,sl=null,tp1=null,tp2=null;
+ if(side!=='WAIT'){let candidates=zones.filter(z=>z.type.startsWith(side==='BUY'?'BULLISH':'BEARISH')&&z.bar>=d.length-35);if(candidates.length){candidates.sort((a,b)=>Math.min(Math.abs(price-a.low),Math.abs(price-a.high))-Math.min(Math.abs(price-b.low),Math.abs(price-b.high)));entry=candidates[0];let buf=Math.max((Math.max(...d.slice(-20).map(x=>x.high))-Math.min(...d.slice(-20).map(x=>x.low)))*.03,.00005);sl=side==='BUY'?entry.low-buf:entry.high+buf;tp1=side==='BUY'?(sw.h.filter(x=>x[1]>price).map(x=>x[1]).sort((a,b)=>a-b)[0]||hi):(sw.l.filter(x=>x[1]<price).map(x=>x[1]).sort((a,b)=>b-a)[0]||lo);tp2=side==='BUY'?hi:lo;reasons.push('Candidate retest of '+entry.type+'. Wait for lower-timeframe confirmation.')}else reasons.push('Confluence exists but no recent aligned FVG provides a retest area; wait.')}
+ if(side==='WAIT')reasons.push('No high-confluence setup. Stand aside until structure and a retestable array align.');
+ return {price,bull,bear,side,pd,mid,hi,lo,entry,sl,tp1,tp2,reasons};
+}
+function fmt(x){return x==null?'—':Number(x).toFixed(5)}
+function runScan(){
+ const d=parseRows($('candles').value),h=parseRows($('htf').value);
+ if(d.length<30){$('scanResult').innerHTML='<div class="note">Please enter at least 30 valid completed candle rows.</div>';return}
+ const r=scan(d,h);const cls=r.side.toLowerCase();
+ $('scanResult').innerHTML=`<div class="row between"><div><div class="label">${$('symbol').value} · ${$('tf').value}</div><div class="signal ${cls}">${r.side}</div></div><div style="text-align:right"><div class="label">Last supplied close</div><b>${fmt(r.price)}</b></div></div><div class="three" style="margin-top:12px"><div><div class="label">Bull score</div><b class="buy">${r.bull}</b></div><div><div class="label">Bear score</div><b class="sell">${r.bear}</b></div><div><div class="label">HTF zone</div><b>${r.pd}</b></div></div><hr style="border-color:var(--line);margin:14px 0"><div class="two"><div>Entry array<br><b>${r.entry?fmt(r.entry.low)+' – '+fmt(r.entry.high):'—'}</b></div><div>Stop loss<br><b>${fmt(r.sl)}</b></div><div>Target 1<br><b>${fmt(r.tp1)}</b></div><div>Target 2<br><b>${fmt(r.tp2)}</b></div></div><h3 style="margin-top:16px">Analysis notes</h3><ul class="sub">${r.reasons.map(x=>'<li>'+x+'</li>').join('')}</ul><div class="note">Rule-based educational approximation. It uses only the candles pasted here; confirm on the live HFM chart. No signal is a guarantee.</div>`;
+}
+function calcRisk(){
+ const bal=num('balance'),pct=num('riskPct'),entry=num('entry'),stop=num('stop'),unit=num('unitValue'),min=num('minLot'),step=num('lotStep'),max=num('maxLot');
+ if([bal,pct,entry,stop,unit,min,step,max].some(x=>!Number.isFinite(x)||x<=0)||entry===stop){$('riskResult').textContent='Check all values. Entry and stop must differ; all inputs must be positive.';return}
+ const budget=bal*pct/100,perLot=Math.abs(entry-stop)*unit,raw=budget/perLot,lot=Math.floor(raw/step)*step,valid=lot>=min&&lot<=max;
+ $('riskResult').innerHTML=`<b>Risk budget:</b> ${budget.toFixed(2)}<br><b>Estimated loss per 1.00 lot:</b> ${perLot.toFixed(2)}<br><b>Calculated volume:</b> ${valid?lot.toFixed(2)+' lots':'No valid lot within broker limits'}<br><b>Estimated risk at rounded volume:</b> ${valid?(perLot*lot).toFixed(2):'—'}<br><br><span class="small">This is an estimate. It excludes spread, commission, swaps, slippage and margin. Confirm the symbol's contract value and volume rules with HFM.</span>`;
+}
+function getJ(){try{return JSON.parse(localStorage.getItem('hfm_journal')||'[]')}catch(e){return []}}
+function saveJ(a){localStorage.setItem('hfm_journal',JSON.stringify(a));renderJ()}
+function addTrade(){let t={date:new Date().toISOString(),symbol:$('jSymbol').value,side:$('jSide').value,entry:num('jEntry'),exit:num('jExit'),lot:num('jLot'),pnl:num('jPnl'),notes:$('jNotes').value};if(!t.symbol||![t.entry,t.exit,t.lot,t.pnl].every(Number.isFinite)||t.lot<=0){alert('Enter symbol, entry, exit, lot and P/L.');return}let a=getJ();a.unshift(t);saveJ(a);$('jNotes').value=''}
+function renderJ(){let a=getJ();$('homeTrades').textContent=a.length;$('journalList').innerHTML=a.length?a.map((t,i)=>`<div class="listitem"><div class="row between"><b>${t.symbol} ${t.side}</b><b class="${t.pnl>=0?'buy':'sell'}">${t.pnl.toFixed(2)}</b></div><div class="small">${new Date(t.date).toLocaleString()} · Entry ${t.entry} · Exit ${t.exit} · ${t.lot} lots</div><div class="sub">${(t.notes||'').replace(/[<>]/g,'')}</div><button class="secondary" style="margin-top:6px" onclick="deleteTrade(${i})">Delete</button></div>`).join(''):'No trades recorded.'}
+function deleteTrade(i){let a=getJ();a.splice(i,1);saveJ(a)}
+function csvEscape(s){return '"'+String(s??'').replace(/"/g,'""')+'"'}
+function exportJournal(){let a=getJ();if(!a.length){alert('No journal trades yet.');return}let keys=['date','symbol','side','entry','exit','lot','pnl','notes'];download('hfm-journal.csv',keys.join(',')+'\n'+a.map(t=>keys.map(k=>csvEscape(t[k])).join(',')).join('\n'),'text/csv')}
+function exportAll(){download('hfm-smart-trader-data.json',JSON.stringify({journal:getJ(),settings:{riskPct:$('riskPct').value}},null,2),'application/json')}
+function download(name,data,type){let u=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function clearAll(){if(confirm('Erase all locally saved journal data on this browser?')){localStorage.removeItem('hfm_journal');renderJ()}}
+function openSearch(q){window.open('https://news.google.com/search?q='+encodeURIComponent(q),'_blank')}
+$('riskPct').addEventListener('input',()=>{$('homeRisk').textContent=($('riskPct').value||'0')+'%'});
+renderJ();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
